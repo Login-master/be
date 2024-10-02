@@ -1,6 +1,7 @@
 package longrun.springsecuritysessionlogin.controller;
 
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import longrun.springsecuritysessionlogin.domain.User;
 import longrun.springsecuritysessionlogin.dto.request.LoginRequest;
@@ -20,12 +21,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
 
     private final UserService userService;
+
     public static PasswordEncoder passwordEncoder(){
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 
     @PostMapping("/sign-up")
-    public ResponseEntity<String> signup(@RequestBody SignupRequest request){
+    public ResponseEntity<String> signup(@Valid @RequestBody SignupRequest request) {
         userService.signUp(request);
         return ResponseEntity.ok("signup success");
     }
