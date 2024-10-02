@@ -3,7 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/loginmaster.iml" filepath="$PROJECT_DIR$/.idea/loginmaster.iml" />
-      <module fileurl="file://$PROJECT_DIR$/spring-security-token-login/spring-security-token-login.iml" filepath="$PROJECT_DIR$/spring-security-token-login/spring-security-token-login.iml" />
     </modules>
   </component>
 </project>
