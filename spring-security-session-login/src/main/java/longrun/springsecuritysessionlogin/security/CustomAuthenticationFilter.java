@@ -53,13 +53,14 @@ public class CustomAuthenticationFilter extends AbstractAuthenticationProcessing
         loginRequest = objectMapper.readValue(messageBody, LoginRequest.class);
         System.out.println("userId = " + loginRequest.getUserId());
         System.out.println("password = " + loginRequest.getPassword());
-
-        response.getWriter().write("OK");
         //JSON 타입으로 변형
 
-        UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(loginRequest.getUserId(),loginRequest.getPassword());
+
+        UsernamePasswordAuthenticationToken authRequest = UsernamePasswordAuthenticationToken.unauthenticated(loginRequest.getUserId(),loginRequest.getPassword());
+        this.setDetails(request,authRequest);
         return this.getAuthenticationManager().authenticate(authRequest);
     }
+
 
     @Nullable
     protected String obtainPassword(HttpServletRequest request) {
