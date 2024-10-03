@@ -6,10 +6,7 @@ import lombok.*;
 @Entity
 @Table(name="users")
 @Getter
-@Setter
-@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
 public class User {
 
     @Id
@@ -33,4 +30,14 @@ public class User {
 
     @Column(nullable = false)
     private Role role;
+
+    @Builder
+    public User(String userId, String email, String password,String name, String phoneNumber ,Role role){
+        this.userId = userId;
+        this.email = email;
+        this.password = password;
+        this.name = name;
+        this.phoneNumber = phoneNumber;
+        this.role = role;
+    }
 }
