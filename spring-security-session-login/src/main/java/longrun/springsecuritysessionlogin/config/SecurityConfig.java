@@ -44,7 +44,7 @@ public class SecurityConfig {
                 .cors(cors -> cors
                         .configurationSource(CorsConfig.corsConfigurationSource()))
                 .authorizeHttpRequests((authorize)-> authorize
-                        .requestMatchers("/login","/member/sign-up").permitAll()
+                        .requestMatchers("/member/login","/member/sign-up","/member/forgot-id","/member/find-id-verify").permitAll()
                         .anyRequest().authenticated())
 //                .formLogin(form -> form
 //                        .loginPage("/login")

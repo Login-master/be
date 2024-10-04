@@ -2,18 +2,17 @@ package longrun.springsecuritysessionlogin.controller;
 
 
 import jakarta.validation.Valid;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import longrun.springsecuritysessionlogin.dto.request.SignupRequest;
 import longrun.springsecuritysessionlogin.dto.request.ForgotIdRequest;
+import longrun.springsecuritysessionlogin.dto.response.ForgotIdResponse;
 import longrun.springsecuritysessionlogin.service.RecoveryService;
 import longrun.springsecuritysessionlogin.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/member")
@@ -37,5 +36,11 @@ public class UserController {
     public ResponseEntity<String> createIdRecoveryCode(@RequestBody ForgotIdRequest request){
         recoveryService.saveVerificationCode(request);
         return ResponseEntity.ok("create recoveryCode");
+    }
+
+    @GetMapping("/find-id-verify")
+    public ResponseEntity<ForgotIdResponse> sendRecoveryCode(@RequestParam String email){
+        ForgotIdResponse response = recoveryService.validateVerificationCode(email);
+        return ResponseEntity.ok(response);
     }
 }
