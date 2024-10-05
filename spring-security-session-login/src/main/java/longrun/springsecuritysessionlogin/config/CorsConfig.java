@@ -2,13 +2,17 @@ package longrun.springsecuritysessionlogin.config;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.springframework.http.HttpMethod;
+import org.springframework.lang.Nullable;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
+//cors 및 preflight 설정
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class CorsConfig {
 
@@ -24,10 +28,9 @@ public class CorsConfig {
         ArrayList<String> allowedHttpMethods = new ArrayList<>();
         allowedHttpMethods.add("GET");
         allowedHttpMethods.add("POST");
-        allowedHttpMethods.add("PUT");
-        allowedHttpMethods.add("DELETE");
+//        allowedHttpMethods.add("PUT");
+//        allowedHttpMethods.add("DELETE");
         configuration.setAllowedMethods(allowedHttpMethods);
-
         configuration.setAllowedHeaders(Collections.singletonList("*"));
 //        configuration.setAllowedHeaders(List.of(HttpHeaders.AUTHORIZATION, HttpHeaders.CONTENT_TYPE));
 
