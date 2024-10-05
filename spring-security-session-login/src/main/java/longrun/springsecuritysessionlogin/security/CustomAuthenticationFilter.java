@@ -23,11 +23,7 @@ import java.nio.charset.StandardCharsets;
 
 
 public class CustomAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
-    public static final String USER_ID_KEY = "userId";
-    public static final String PASSWORD_KEY = "password";
     private static final AntPathRequestMatcher DEFAULT_ANT_PATH_REQUEST_MATCHER = new AntPathRequestMatcher("/member/login", "POST");
-    private String userIdParameter = "userId";
-    private String passwordParameter = "password";
     private boolean postOnly = true;
 
     public CustomAuthenticationFilter() {
@@ -48,55 +44,16 @@ public class CustomAuthenticationFilter extends AbstractAuthenticationProcessing
         ObjectMapper objectMapper = new ObjectMapper();
         ServletInputStream inputStream = request.getInputStream();
         String messageBody = StreamUtils.copyToString(inputStream, StandardCharsets.UTF_8);
-
-        System.out.println("messageBody = " + messageBody);
-        LoginRequest loginRequest = new LoginRequest();
-        loginRequest = objectMapper.readValue(messageBody, LoginRequest.class);
-        System.out.println("userId = " + loginRequest.getUserId());
-        System.out.println("password = " + loginRequest.getPassword());
+        LoginRequest loginRequest = objectMapper.readValue(messageBody, LoginRequest.class);
         //JSON 타입으로 변형
-
-
         UsernamePasswordAuthenticationToken authRequest = UsernamePasswordAuthenticationToken.unauthenticated(loginRequest.getUserId(),loginRequest.getPassword());
         this.setDetails(request,authRequest);
         return this.getAuthenticationManager().authenticate(authRequest);
-    }
-
-
-    @Nullable
-    protected String obtainPassword(HttpServletRequest request) {
-        return request.getParameter(this.passwordParameter);
-    }
-
-    @Nullable
-    protected String obtainUserId(HttpServletRequest request) {
-        return request.getParameter(this.userIdParameter);
     }
 
     protected void setDetails(HttpServletRequest request, UsernamePasswordAuthenticationToken authRequest) {
         authRequest.setDetails(this.authenticationDetailsSource.buildDetails(request));
     }
 
-    public void setUserIdParameter(String userIdParameter) {
-        Assert.hasText(userIdParameter, "Username parameter must not be empty or null");
-        this.userIdParameter = userIdParameter;
-    }
-
-    public void setPasswordParameter(String passwordParameter) {
-        Assert.hasText(passwordParameter, "Password parameter must not be empty or null");
-        this.passwordParameter = passwordParameter;
-    }
-
-    public void setPostOnly(boolean postOnly) {
-        this.postOnly = postOnly;
-    }
-
-    public final String getUserIdParameter() {
-        return this.userIdParameter;
-    }
-
-    public final String getPasswordParameter() {
-        return this.passwordParameter;
-    }
 }
 
