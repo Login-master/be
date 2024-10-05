@@ -12,7 +12,11 @@ import longrun.springsecuritysessionlogin.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/member")
@@ -27,8 +31,20 @@ public class UserController {
     }
 
     @PostMapping("/sign-up")
-    public ResponseEntity<String> signup(@Valid @RequestBody SignupRequest request) {
-        userService.signUp(request);
+    public ResponseEntity<String> signup(@Valid @RequestBody SignupRequest request, BindingResult bindingResult) {
+        // valid오류시 오류 메세지 담아서 응답
+        if (bindingResult.hasErrors()) {
+            List<FieldError> list = bindingResult.getFieldErrors();
+            for(FieldError error : list) {
+                return ResponseEntity.badRequest().body(error.getDefaultMessage());
+            }
+        }
+        try {
+            userService.signUp(request);
+        }
+        catch (IllegalStateException e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
         return ResponseEntity.ok("signup success");
     }
 
@@ -39,8 +55,12 @@ public class UserController {
     }
 
     @GetMapping("/find-id-verify")
-    public ResponseEntity<ForgotIdResponse> sendRecoveryCode(@RequestParam String email){
-        ForgotIdResponse response = recoveryService.validateVerificationCode(email);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<String> sendRecoveryCode(@RequestParam String email){
+        try {
+            return ResponseEntity.ok(recoveryService.validateVerificationCode(email).getId());
+        }
+        catch (IllegalArgumentException e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 }

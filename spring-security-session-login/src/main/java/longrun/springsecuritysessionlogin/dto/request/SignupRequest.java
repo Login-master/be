@@ -12,7 +12,7 @@ import longrun.springsecuritysessionlogin.domain.User;
 public class SignupRequest {
 
     @NotBlank(message = "아이디는 필수 입력 값입니다.")
-    @Size(min = 6, max = 12)
+    @Size(min = 6, max = 12,message = "아이디는 6에서 12사이의 길이여야 합니다.")
     private String userId;
 
     @NotBlank(message = "이메일은 필수 입력 값입니다.")
@@ -20,7 +20,7 @@ public class SignupRequest {
     private String email;
 
     @NotBlank(message = "비밀번호는 필수 입력 값입니다.")
-    @Size(min = 8)
+    @Size(min = 8, message = "비밀번호가 너무 짧습니다(6글자 이상)")
     private String password;
 
     @NotBlank(message = "이름은 필수 입력 값입니다.")
