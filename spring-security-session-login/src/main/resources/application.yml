@@ -1,0 +1,5 @@
+spring.application.name: spring-security-session-login
+
+spring:
+  config:
+    import: application-secret.yml

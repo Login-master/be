@@ -35,3 +35,6 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### Ignore secret configuration files ###
+application-secret.yml
