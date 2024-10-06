@@ -33,5 +33,15 @@ out/
 /nbdist/
 /.nb-gradle/
 
+# Ignore secret configuration files
+application-secret.yml
+
+
 ### VS Code ###
 .vscode/
+
+# Ignore all .xml files
+*.xml
+
+# Ignore all .uml files
+*.uml
