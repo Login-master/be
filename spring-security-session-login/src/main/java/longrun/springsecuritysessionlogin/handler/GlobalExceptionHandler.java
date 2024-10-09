@@ -14,8 +14,15 @@ public class GlobalExceptionHandler {
 
     // validated 시 예외처리
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<String> handleValidException(MethodArgumentNotValidException e){
+    public ResponseEntity<Object> handleValidException(MethodArgumentNotValidException e){
         ErrorCode errorCode = ErrorCode.INVALID_INPUT_VALUE;
-        return ResponseEntity.status(errorCode.getStatus()).body(errorCode.getMessage());
+        BindingResult bindingResult = e.getBindingResult();
+
+        StringBuilder builder = new StringBuilder();
+        for (FieldError fieldError : bindingResult.getFieldErrors()) {
+            builder.append(fieldError.getDefaultMessage());
+            break;// 일단 하나의 오류 정보만 담음
+        }
+        return ResponseEntity.status(errorCode.getStatus()).body(builder);
     }
 }
