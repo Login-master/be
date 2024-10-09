@@ -31,20 +31,8 @@ public class UserController {
     }
 
     @PostMapping("/sign-up")
-    public ResponseEntity<String> signup(@Valid @RequestBody SignupRequest request, BindingResult bindingResult) {
-        // valid오류시 오류 메세지 담아서 응답
-        if (bindingResult.hasErrors()) {
-            List<FieldError> list = bindingResult.getFieldErrors();
-            for(FieldError error : list) {
-                return ResponseEntity.badRequest().body(error.getDefaultMessage());
-            }
-        }
-        try {
-            userService.signUp(request);
-        }
-        catch (IllegalStateException e){
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+    public ResponseEntity<String> signup(@Valid @RequestBody SignupRequest request) {
+        userService.signUp(request);
         return ResponseEntity.ok("signup success");
     }
 
