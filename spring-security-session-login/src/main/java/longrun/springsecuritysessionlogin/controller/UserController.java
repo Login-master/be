@@ -38,17 +38,15 @@ public class UserController {
 
     @PostMapping("/forgot-id")
     public ResponseEntity<String> createIdRecoveryCode(@RequestBody ForgotIdRequest request){
+        userService.findByEmail(request.getEmail());
         recoveryService.saveVerificationCode(request);
         return ResponseEntity.ok("create recoveryCode");
     }
 
     @GetMapping("/find-id-verify")
     public ResponseEntity<String> sendRecoveryCode(@RequestParam String email){
-        try {
-            return ResponseEntity.ok(recoveryService.validateVerificationCode(email).getId());
-        }
-        catch (IllegalArgumentException e){
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+
+        return ResponseEntity.ok(recoveryService.validateVerificationCode(email).getId());
+
     }
 }
