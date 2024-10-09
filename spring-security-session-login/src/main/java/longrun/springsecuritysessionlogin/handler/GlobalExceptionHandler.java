@@ -31,6 +31,11 @@ public class GlobalExceptionHandler {
         ErrorCode errorCode = ErrorCode.USER_NOT_FOUND;
         return ResponseEntity.status(errorCode.getStatus()).body(errorCode);
     }
+    @ExceptionHandler(NullPointerException.class)
+    public ResponseEntity<Object> handleInvalidatedException(NullPointerException e){
+        ErrorCode errorCode = ErrorCode.INVALID_VERIFICATION_CODE;
+        return ResponseEntity.status(errorCode.getStatus()).body(errorCode);
+    }
 
 
 }

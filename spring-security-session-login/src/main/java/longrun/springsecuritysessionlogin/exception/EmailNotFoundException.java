@@ -7,3 +7,4 @@ public class EmailNotFoundException extends RuntimeException {
     }
 
 }
+
