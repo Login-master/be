@@ -26,7 +26,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(errorCode.getStatus()).body(builder);
     }
     @ExceptionHandler(BusinessException.class)
-    public ResponseEntity<Object> handleEmailNotFoundException(BusinessException e){
+    public ResponseEntity<Object> handleBusinessException(BusinessException e){
         ErrorCode errorCode = e.getErrorCode();
         return ResponseEntity.status(errorCode.getStatus()).body(errorCode);
     }
