@@ -12,6 +12,7 @@ public enum ErrorCode {
     ACCESS_DENIED(403,"COMMON-001","접근 권한이 없습니다."),
     INVALID_INPUT_VALUE(400,"COMMON-002","유효성 검증에 실패하였습니다."),
     UNAUTHORIZED(401,"COMMON-003","인증정보가 존재하지 않습니다."),
+    INTERNAL_SERVER_ERROR(404,"COMMON-004", "Server Error"),
 
     //USER
     USER_NOT_FOUND(404,"USER-001","회원정보가 없습니다"),
