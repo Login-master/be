@@ -1,5 +1,6 @@
 package longrun.springsecuritysessionlogin.handler;
 
+import longrun.springsecuritysessionlogin.dto.response.ErrorResponse;
 import longrun.springsecuritysessionlogin.exception.BusinessException;
 import longrun.springsecuritysessionlogin.exception.ErrorCode;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +24,10 @@ public class GlobalExceptionHandler {
             builder.append(fieldError.getDefaultMessage());
             break;// 일단 하나의 오류 정보만 담음
         }
-        return ResponseEntity.status(errorCode.getStatus()).body(builder);
+        return ResponseEntity.status(errorCode.getStatus()).body(ErrorResponse.builder()
+                .status(errorCode.getStatus())
+                .code(errorCode.getCode())
+                .message(String.valueOf(builder)).build());
     }
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<Object> handleBusinessException(BusinessException e){

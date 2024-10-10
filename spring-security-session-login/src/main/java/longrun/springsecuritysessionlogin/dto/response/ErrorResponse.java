@@ -11,9 +11,9 @@ public class ErrorResponse {
     private String message;
 
     @Builder
-    private ErrorResponse(final ErrorCode code) {
-        this.status = code.getStatus();
-        this.message = code.getMessage();
-        this.code = code.getCode();
+    private ErrorResponse(final int status, final String code, final String message) {
+        this.status = status;
+        this.message = message;
+        this.code = code;
     }
 }
