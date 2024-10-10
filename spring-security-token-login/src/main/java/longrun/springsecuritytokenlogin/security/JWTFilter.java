@@ -5,6 +5,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import longrun.springsecuritytokenlogin.domain.User;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -14,6 +15,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
 @RequiredArgsConstructor
+@Slf4j
 public class JWTFilter extends OncePerRequestFilter {
 
     private final JWTUtil jwtUtil;
@@ -27,6 +29,7 @@ public class JWTFilter extends OncePerRequestFilter {
         // Authorization 헤더 검증
         // Authorization 헤더가 비어있거나 "Bearer " 로 시작하지 않은 경우
         if(authorization == null || !authorization.startsWith("Bearer ")){
+            log.info("토큰이 없거나, 유효하지 않음");
 
             // 토큰이 유효하지 않으므로 request와 response를 다음 필터로 넘겨줌
             filterChain.doFilter(request, response);
@@ -41,13 +44,15 @@ public class JWTFilter extends OncePerRequestFilter {
         // token 소멸 시간 검증
         // 유효기간이 만료한 경우
         if(jwtUtil.isExpired(token)){
+            log.info("유효기간 만료된 토큰 요청");
             filterChain.doFilter(request, response);
 
             // 메서드 종료
             return;
         }
 
-        // 최종적으로 token 검증 완료 => 일시적인 session 생성
+        log.info("토큰 요청 성공");
+        // 최종적으로 token 검증 완료 => 일시적인 생성
         // session에 user 정보 설정
         String loginId = jwtUtil.getLoginId(token);
         String role = jwtUtil.getRole(token);

@@ -52,7 +52,7 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests((auth) -> auth
                         .requestMatchers("/member/*").permitAll()
-                        .requestMatchers("/jwt-login/admin").hasRole("ADMIN")
+                        .requestMatchers("/admin").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 );
 
