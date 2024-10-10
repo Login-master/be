@@ -1,7 +1,6 @@
 package longrun.springsecuritysessionlogin.handler;
 
-import longrun.springsecuritysessionlogin.dto.response.ErrorResponse;
-import longrun.springsecuritysessionlogin.exception.EmailNotFoundException;
+import longrun.springsecuritysessionlogin.exception.BusinessException;
 import longrun.springsecuritysessionlogin.exception.ErrorCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -26,14 +25,9 @@ public class GlobalExceptionHandler {
         }
         return ResponseEntity.status(errorCode.getStatus()).body(builder);
     }
-    @ExceptionHandler(EmailNotFoundException.class)
-    public ResponseEntity<Object> handleEmailNotFoundException(EmailNotFoundException e){
-        ErrorCode errorCode = ErrorCode.USER_NOT_FOUND;
-        return ResponseEntity.status(errorCode.getStatus()).body(errorCode);
-    }
-    @ExceptionHandler(NullPointerException.class)
-    public ResponseEntity<Object> handleInvalidatedException(NullPointerException e){
-        ErrorCode errorCode = ErrorCode.INVALID_VERIFICATION_CODE;
+    @ExceptionHandler(BusinessException.class)
+    public ResponseEntity<Object> handleEmailNotFoundException(BusinessException e){
+        ErrorCode errorCode = e.getErrorCode();
         return ResponseEntity.status(errorCode.getStatus()).body(errorCode);
     }
 

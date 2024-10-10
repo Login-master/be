@@ -22,6 +22,6 @@ public class CustomAuthenticationFailureHandler extends SimpleUrlAuthenticationF
         response.setStatus(errorCode.getStatus());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("UTF-8");
-        objectMapper.writeValue(response.getWriter(), errorCode);
+        objectMapper.writeValue(response.getWriter(), errorCode );
     }
 }
