@@ -2,6 +2,8 @@ package longrun.springsecuritytokenlogin.security;
 
 import lombok.RequiredArgsConstructor;
 import longrun.springsecuritytokenlogin.domain.User;
+import longrun.springsecuritytokenlogin.exception.CommonErrorCode;
+import longrun.springsecuritytokenlogin.exception.RestApiException;
 import longrun.springsecuritytokenlogin.repository.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -18,11 +20,10 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
-
-        Optional<User> user = userRepository.findByUserId(userId);
-        if(user != null) {
-            return new CustomUserDetails(user.get());
-        }
-        return null;
+        System.out.println(1);
+        User user = userRepository.findByUserId(userId)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + userId));
+        return new CustomUserDetails(user);
     }
+
 }
