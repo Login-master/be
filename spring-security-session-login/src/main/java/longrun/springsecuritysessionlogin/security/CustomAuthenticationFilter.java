@@ -5,6 +5,7 @@ import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import longrun.springsecuritysessionlogin.dto.request.LoginRequest;
+import longrun.springsecuritysessionlogin.exception.ErrorCode;
 import org.springframework.lang.Nullable;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationServiceException;
@@ -18,6 +19,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.util.Assert;
 import org.springframework.util.StreamUtils;
 
+import javax.lang.model.type.ErrorType;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
@@ -33,6 +35,7 @@ public class CustomAuthenticationFilter extends AbstractAuthenticationProcessing
     public CustomAuthenticationFilter(AuthenticationManager authenticationManager) {
         super(DEFAULT_ANT_PATH_REQUEST_MATCHER, authenticationManager);
     }
+
 
     //로그인 요청 처리 및 인증 시도
     @Override
@@ -54,6 +57,5 @@ public class CustomAuthenticationFilter extends AbstractAuthenticationProcessing
     protected void setDetails(HttpServletRequest request, UsernamePasswordAuthenticationToken authRequest) {
         authRequest.setDetails(this.authenticationDetailsSource.buildDetails(request));
     }
-
 }
 

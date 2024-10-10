@@ -5,7 +5,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import longrun.springsecuritysessionlogin.handler.CustomAuthenticationFailureHandler;
 import longrun.springsecuritysessionlogin.handler.CustomAuthenticationSuccessHandler;
-import longrun.springsecuritysessionlogin.repository.UserRepository;
 import longrun.springsecuritysessionlogin.security.CustomAuthenticationFilter;
 import longrun.springsecuritysessionlogin.security.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
@@ -31,7 +30,6 @@ import org.springframework.security.web.context.SecurityContextRepository;
 public class SecurityConfig {
 
     private final CustomUserDetailsService customUserDetailsService;
-    private final UserRepository userRepository;
 
 
 
@@ -65,7 +63,6 @@ public class SecurityConfig {
                         .deleteCookies("JSESSIONID"))
 //                .httpBasic(AbstractHttpConfigurer::disable)
                 .addFilterAfter(authenticationFilter, LogoutFilter.class);
-
 
         return http.build();
     }
