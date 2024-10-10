@@ -46,7 +46,7 @@ public class UserController {
     @GetMapping("/find-id-verify")
     public ResponseEntity<String> sendRecoveryCode(@RequestParam String email){
 
-        return ResponseEntity.ok(recoveryService.validateVerificationCode(email).getId());
+        return ResponseEntity.ok(recoveryService.validateVerificationCode(email));
 
     }
 }
