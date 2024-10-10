@@ -4,9 +4,9 @@ import lombok.RequiredArgsConstructor;
 import longrun.springsecuritytokenlogin.domain.EmailAuthenticateCode;
 import longrun.springsecuritytokenlogin.domain.User;
 import longrun.springsecuritytokenlogin.dto.request.EmailAuthenticateCodeRequest;
-import longrun.springsecuritytokenlogin.dto.request.LoginRequest;
 import longrun.springsecuritytokenlogin.dto.request.SignupRequest;
-import longrun.springsecuritytokenlogin.dto.response.LoginResponse;
+import longrun.springsecuritytokenlogin.exception.RestApiException;
+import longrun.springsecuritytokenlogin.exception.UserErrorCode;
 import longrun.springsecuritytokenlogin.repository.EmailAuthenticateCodeRepository;
 import longrun.springsecuritytokenlogin.repository.UserRepository;
 import longrun.springsecuritytokenlogin.security.JWTUtil;
@@ -28,25 +28,21 @@ public class UserService {
 
     public void signUp(SignupRequest signupRequest){
         signupRequest.setPassword(BCryptPasswordEncoder.encode(signupRequest.getPassword()));
+
         // 아이디가 이미 존재하는 경우 예외 던지기
         userRepository.findByUserId(signupRequest.getUserId())
-                .ifPresent(user -> { throw new IllegalArgumentException("이미 존재하는 아이디입니다."); });
+                .ifPresent(user -> {
+                    throw new RestApiException(UserErrorCode.USER_ALREADY_EXISTS);
+                });
+
+        // 이메일이 이미 등록된 경우 예외 던지기
         userRepository.findByEmail(signupRequest.getEmail())
-                .ifPresent(user -> { throw new IllegalArgumentException("이미 회원가입된 이메일입니다"); });
+                .ifPresent(user -> {
+                    throw new RestApiException(UserErrorCode.EMAIL_ALREADY_REGISTERED);
+                });
+
+        // 사용자 저장
         userRepository.save(signupRequest.toEntity());
-    }
-
-    public LoginResponse login(LoginRequest loginRequest){
-        User user = userRepository.findByUserId(loginRequest.getUserId())
-                .orElseThrow(() -> new IllegalArgumentException("존재하지않는 아이디입니다."));
-        if (!BCryptPasswordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
-            throw new IllegalArgumentException("비밀번호가 올바르지 않습니다.");
-        }
-
-        String token = jwtUtil.createJwt(user.getUserId(), String.valueOf(user.getRole()), 1000 * 60 * 60L);
-        LoginResponse loginResponse = new LoginResponse(user, token);
-
-        return loginResponse;
     }
 
     public String sendAuthenticateCode(EmailAuthenticateCodeRequest emailAuthenticateCodeRequest){
@@ -54,36 +50,38 @@ public class UserService {
         String newAuthenticateCode = "111111"; // 새 인증 코드 생성 메서드
 
         if (byEmail.isPresent()) {
-            // 이메일이 존재하면 인증 코드만 업데이트
             EmailAuthenticateCode existingCode = byEmail.get();
-            // 새로운 EmailAuthenticateCode 객체 생성
             EmailAuthenticateCode updatedCode = new EmailAuthenticateCode(
-                    existingCode.getId(), // 기존 ID 유지
-                    existingCode.getEmail(), // 기존 이메일 유지
-                    newAuthenticateCode // 새로운 인증 코드로 업데이트
+                    existingCode.getId(),
+                    existingCode.getEmail(),
+                    newAuthenticateCode
             );
-            emailAuthenticateCodeRepository.save(updatedCode); // 업데이트된 엔티티 저장
+            emailAuthenticateCodeRepository.save(updatedCode);
         } else {
-            // 이메일이 존재하지 않으면 새로 생성
             EmailAuthenticateCode newCode = EmailAuthenticateCode.builder()
                     .email(emailAuthenticateCodeRequest.getEmail())
                     .authenticateCode(newAuthenticateCode)
                     .build();
-            emailAuthenticateCodeRepository.save(newCode); // 새 엔티티 저장
+            emailAuthenticateCodeRepository.save(newCode);
         }
 
         return newAuthenticateCode;
     }
 
     public String verifyAuthenticateCode(EmailAuthenticateCodeRequest emailAuthenticateCodeRequest){
+        // 이메일이 인증되지 않았을 경우 예외 발생
         EmailAuthenticateCode byEmail = emailAuthenticateCodeRepository.findByEmail(emailAuthenticateCodeRequest.getEmail())
-                .orElseThrow(() -> new IllegalArgumentException("인증된 적 없는 메일입니다."));
+                .orElseThrow(() -> new RestApiException(UserErrorCode.EMAIL_NOT_AUTHENTICATED));
+
+        // 인증 코드가 일치하지 않는 경우 예외 발생
         if(!byEmail.getAuthenticateCode().equals(emailAuthenticateCodeRequest.getAuthenticateCode())){
-            throw new IllegalArgumentException("인증번호가 일치하지않습니다.");
+            throw new RestApiException(UserErrorCode.AUTHENTICATION_CODE_MISMATCH);
         }
 
+        // 이메일이 회원가입된 기록이 없는 경우 예외 발생
         User user = userRepository.findByEmail(byEmail.getEmail())
-                .orElseThrow(() -> new IllegalArgumentException("회원가입 기록이 없는 이메일입니다."));
+                .orElseThrow(() -> new RestApiException(UserErrorCode.EMAIL_NOT_REGISTERED));
+
         String encodedUserId = userIdEncoder(user);
         return encodedUserId;
     }
@@ -91,14 +89,9 @@ public class UserService {
     private String userIdEncoder(User user){
         String userId = user.getUserId();
         int length = userId.length();
-        // 중간 두 글자의 시작 인덱스 계산
         int start = (length - 2) / 2;
-
-        // 중간 두 글자를 *로 마스킹
         StringBuilder maskedUserId = new StringBuilder(userId);
-        maskedUserId.replace(start, start + 2, "**"); // 중간 두 글자 마스킹
-
+        maskedUserId.replace(start, start + 2, "**");
         return maskedUserId.toString();
     }
 }
-
