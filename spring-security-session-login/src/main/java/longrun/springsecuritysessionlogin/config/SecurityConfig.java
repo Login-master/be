@@ -64,6 +64,7 @@ public class SecurityConfig {
 //                .httpBasic(AbstractHttpConfigurer::disable)
                 .addFilterAfter(authenticationFilter, LogoutFilter.class);
 
+
         return http.build();
     }
 
