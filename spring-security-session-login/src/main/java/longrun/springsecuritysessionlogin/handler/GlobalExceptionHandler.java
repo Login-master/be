@@ -2,6 +2,7 @@ package longrun.springsecuritysessionlogin.handler;
 
 import longrun.springsecuritysessionlogin.dto.response.ErrorResponse;
 import longrun.springsecuritysessionlogin.exception.BusinessException;
+import longrun.springsecuritysessionlogin.exception.DuplicationException;
 import longrun.springsecuritysessionlogin.exception.ErrorCode;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,15 +31,22 @@ public class GlobalExceptionHandler {
                 .code(errorCode.getCode())
                 .message(String.valueOf(builder)).build());
     }
+
+    @ExceptionHandler(DuplicationException.class)
+    public ResponseEntity<Object> handleDuplicationException(DuplicationException e){
+        final ErrorCode errorCode = e.getErrorCode();
+        final String value = e.getValue();
+        return ResponseEntity.status(errorCode.getStatus()).body(errorCode);
+    }
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<Object> handleBusinessException(BusinessException e){
-        ErrorCode errorCode = e.getErrorCode();
+        final ErrorCode errorCode = e.getErrorCode();
         return ResponseEntity.status(errorCode.getStatus()).body(errorCode);
     }
 
     @ExceptionHandler(Exception.class)
     protected ResponseEntity<ErrorResponse> handleException(Exception e) {
-        ErrorCode errorCode = ErrorCode.INTERNAL_SERVER_ERROR;
+        final ErrorCode errorCode = ErrorCode.INTERNAL_SERVER_ERROR;
         final ErrorResponse response = ErrorResponse.builder()
                 .status(errorCode.getStatus())
                 .code(errorCode.getCode())

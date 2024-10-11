@@ -4,8 +4,7 @@ package longrun.springsecuritysessionlogin.service;
 import lombok.RequiredArgsConstructor;
 import longrun.springsecuritysessionlogin.domain.User;
 import longrun.springsecuritysessionlogin.dto.request.SignupRequest;
-import longrun.springsecuritysessionlogin.exception.BusinessException;
-import longrun.springsecuritysessionlogin.exception.ErrorCode;
+import longrun.springsecuritysessionlogin.exception.*;
 import longrun.springsecuritysessionlogin.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -30,13 +29,13 @@ public class UserService {
 
     private void validateDuplicateUser(SignupRequest request){
         if(userRepository.findByEmail(request.getEmail()).isPresent()){
-            throw new BusinessException(ErrorCode.USER_EMAIL_EXIST,"이미 가입된 이메일입니다.");
+            throw new EmailDuplicationException(request.getEmail());
         }
         if(userRepository.findByUserId(request.getUserId()).isPresent()){
-            throw new BusinessException(ErrorCode.USER_ID_EXIST,"이미 가입된 아이디입니다.");
+            throw new UserIdDuplicationException(request.getUserId());
         }
         if(userRepository.findByPhoneNumber(request.getPhoneNumber()).isPresent()){
-            throw new BusinessException(ErrorCode.USER_PHONE_EXIST,"이미 가입된 전화번호입니다.");
+            throw new PhoneNumberDuplicationException(request.getPhoneNumber());
         }
     }
 }
