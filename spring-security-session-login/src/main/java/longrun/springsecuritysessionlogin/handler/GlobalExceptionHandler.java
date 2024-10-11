@@ -33,26 +33,34 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(DuplicationException.class)
-    public ResponseEntity<Object> handleDuplicationException(DuplicationException e){
+    public ResponseEntity<ErrorResponse> handleDuplicationException(DuplicationException e){
         final ErrorCode errorCode = e.getErrorCode();
         final String value = e.getValue();
-        return ResponseEntity.status(errorCode.getStatus()).body(errorCode);
+        return ResponseEntity.status(errorCode.getStatus()).body(ErrorResponse.builder()
+                        .status(errorCode.getStatus())
+                        .code(errorCode.getCode())
+                        .message(errorCode.getMessage())
+                        .value(value)
+                        .build());
     }
     @ExceptionHandler(BusinessException.class)
-    public ResponseEntity<Object> handleBusinessException(BusinessException e){
+    public ResponseEntity<ErrorResponse> handleBusinessException(BusinessException e){
         final ErrorCode errorCode = e.getErrorCode();
-        return ResponseEntity.status(errorCode.getStatus()).body(errorCode);
+        return ResponseEntity.status(errorCode.getStatus()).body(ErrorResponse.builder()
+                .status(errorCode.getStatus())
+                .code(errorCode.getCode())
+                .message(errorCode.getMessage())
+                .build());
     }
 
     @ExceptionHandler(Exception.class)
     protected ResponseEntity<ErrorResponse> handleException(Exception e) {
         final ErrorCode errorCode = ErrorCode.INTERNAL_SERVER_ERROR;
-        final ErrorResponse response = ErrorResponse.builder()
+        return ResponseEntity.status(errorCode.getStatus()).body(ErrorResponse.builder()
                 .status(errorCode.getStatus())
                 .code(errorCode.getCode())
                 .message(errorCode.getMessage())
-                .build();
-        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+                .build());
     }
 }
 
