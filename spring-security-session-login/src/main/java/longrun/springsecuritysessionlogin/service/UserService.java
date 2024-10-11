@@ -18,7 +18,7 @@ public class UserService {
 
     public User findByEmail(String email) {
         return userRepository.findByEmail(email)
-                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND,email));
+                .orElseThrow(() -> new UserNotFoundException(email));
     }
 
     public void signUp(SignupRequest request){

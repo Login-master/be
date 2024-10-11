@@ -25,6 +25,7 @@ public enum ErrorCode {
     EXPIRED_VERIFICATION_CODE(404,"RECOVERY-002","인증번호가 만료되었습니다.");
 
 
+
     private final int status;
     private final String code;
     private final String message;
