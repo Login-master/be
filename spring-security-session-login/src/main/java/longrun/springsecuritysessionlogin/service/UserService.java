@@ -3,7 +3,7 @@ package longrun.springsecuritysessionlogin.service;
 
 import lombok.RequiredArgsConstructor;
 import longrun.springsecuritysessionlogin.domain.User;
-import longrun.springsecuritysessionlogin.dto.request.SignupRequest;
+import longrun.springsecuritysessionlogin.dto.request.SignUpRequest;
 import longrun.springsecuritysessionlogin.exception.*;
 import longrun.springsecuritysessionlogin.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,7 +21,7 @@ public class UserService {
                 .orElseThrow(() -> new UserNotFoundException(email));
     }
 
-    public void signUp(SignupRequest request){
+    public void signUp(SignUpRequest request){
         if(userRepository.findByEmail(request.getEmail()).isPresent()){
             throw new EmailDuplicationException(request.getEmail());
         }

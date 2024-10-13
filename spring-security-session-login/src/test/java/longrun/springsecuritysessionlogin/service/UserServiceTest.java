@@ -2,10 +2,9 @@ package longrun.springsecuritysessionlogin.service;
 
 import longrun.springsecuritysessionlogin.domain.Role;
 import longrun.springsecuritysessionlogin.domain.User;
-import longrun.springsecuritysessionlogin.dto.request.SignupRequest;
+import longrun.springsecuritysessionlogin.dto.request.SignUpRequest;
 import longrun.springsecuritysessionlogin.exception.*;
 import longrun.springsecuritysessionlogin.repository.UserRepository;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -13,7 +12,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -21,7 +19,6 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.catchThrowable;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -92,7 +89,7 @@ class UserServiceTest {
         @DisplayName("회원가입 성공")
         void signUp_Success() {
             // Given
-            SignupRequest request = new SignupRequest("test1111", "test1111@gmail.com", "@@Test11111", "test", "01011111111");
+            SignUpRequest request = new SignUpRequest("test1111", "test1111@gmail.com", "@@Test11111", "test", "01011111111");
             when(userRepository.findByEmail(request.getEmail())).thenReturn(Optional.empty());
             when(userRepository.findByUserId(request.getUserId())).thenReturn(Optional.empty());
             when(userRepository.findByPhoneNumber(request.getPhoneNumber())).thenReturn(Optional.empty());
@@ -109,7 +106,7 @@ class UserServiceTest {
         @DisplayName("회원가입 실패 - 중복이메일")
         void signUp_DuplicateEmail() {
             // Given
-            SignupRequest request = new SignupRequest("test1111", "test1111@gmail.com", "@@Test11111", "test", "01011111111");
+            SignUpRequest request = new SignUpRequest("test1111", "test1111@gmail.com", "@@Test11111", "test", "01011111111");
             when(userRepository.findByEmail(request.getEmail())).thenReturn(Optional.of(user));
 
             //When
@@ -125,7 +122,7 @@ class UserServiceTest {
         @DisplayName("회원가입 실패 - 중복아이디")
         void signUp_DuplicateUserId() {
             // Given
-            SignupRequest request = new SignupRequest("test1111", "test1111@gmail.com", "@@Test11111", "test", "01011111111");
+            SignUpRequest request = new SignUpRequest("test1111", "test1111@gmail.com", "@@Test11111", "test", "01011111111");
             when(userRepository.findByEmail(request.getEmail())).thenReturn(Optional.empty());
             when(userRepository.findByUserId(request.getUserId())).thenReturn(Optional.of(user));
 
@@ -142,7 +139,7 @@ class UserServiceTest {
         @DisplayName("회원가입 실패 - 중복전화번호")
         void signUp_DuplicatePhoneNumber() {
             // Given
-            SignupRequest request = new SignupRequest("test1111", "test1111@gmail.com", "@@Test11111", "test", "01011111111");
+            SignUpRequest request = new SignUpRequest("test1111", "test1111@gmail.com", "@@Test11111", "test", "01011111111");
             when(userRepository.findByEmail(request.getEmail())).thenReturn(Optional.empty());
             when(userRepository.findByUserId(request.getUserId())).thenReturn(Optional.empty());
             when(userRepository.findByPhoneNumber(request.getPhoneNumber())).thenReturn(Optional.of(user));
