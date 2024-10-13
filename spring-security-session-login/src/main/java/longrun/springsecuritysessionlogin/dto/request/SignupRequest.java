@@ -4,11 +4,14 @@ package longrun.springsecuritysessionlogin.dto.request;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import longrun.springsecuritysessionlogin.domain.Role;
 import longrun.springsecuritysessionlogin.domain.User;
 
 @Data
+@AllArgsConstructor
 public class SignupRequest {
 
     @NotBlank(message = "아이디는 필수 입력 값입니다.")
@@ -29,6 +32,8 @@ public class SignupRequest {
 
 
     private String phoneNumber;
+
+
 
     public User toEntity(){
         return User.builder()

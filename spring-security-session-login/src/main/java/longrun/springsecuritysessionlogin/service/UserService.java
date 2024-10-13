@@ -22,12 +22,6 @@ public class UserService {
     }
 
     public void signUp(SignupRequest request){
-        validateDuplicateUser(request);
-        request.setPassword(passwordEncoder.encode(request.getPassword()));
-        userRepository.save(request.toEntity());
-    }
-
-    private void validateDuplicateUser(SignupRequest request){
         if(userRepository.findByEmail(request.getEmail()).isPresent()){
             throw new EmailDuplicationException(request.getEmail());
         }
@@ -37,5 +31,7 @@ public class UserService {
         if(userRepository.findByPhoneNumber(request.getPhoneNumber()).isPresent()){
             throw new PhoneNumberDuplicationException(request.getPhoneNumber());
         }
+        request.setPassword(passwordEncoder.encode(request.getPassword()));
+        userRepository.save(request.toEntity());
     }
 }
