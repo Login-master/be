@@ -3,13 +3,11 @@ package longrun.springsecuritysessionlogin.service;
 
 import lombok.RequiredArgsConstructor;
 import longrun.springsecuritysessionlogin.domain.User;
-import longrun.springsecuritysessionlogin.dto.request.SignupRequest;
-import longrun.springsecuritysessionlogin.exception.EmailNotFoundException;
+import longrun.springsecuritysessionlogin.dto.request.SignUpRequest;
+import longrun.springsecuritysessionlogin.exception.*;
 import longrun.springsecuritysessionlogin.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -20,24 +18,21 @@ public class UserService {
 
     public User findByEmail(String email) {
         return userRepository.findByEmail(email)
-                .orElseThrow(() -> new EmailNotFoundException(email));
+                .orElseThrow(() -> new UserNotFoundException(email));
     }
 
-    public void signUp(SignupRequest request){
-        validateDuplicateUser(request);
-        request.setPassword(passwordEncoder.encode(request.getPassword()));
-        userRepository.save(request.toEntity());
-    }
-
-    private void validateDuplicateUser(SignupRequest request){
+    public User signUp(SignUpRequest request){
         if(userRepository.findByEmail(request.getEmail()).isPresent()){
-            throw new IllegalStateException("이미 가입된 이메일입니다. ");
+            throw new EmailDuplicationException(request.getEmail());
         }
         if(userRepository.findByUserId(request.getUserId()).isPresent()){
-            throw new IllegalStateException("이미 가입된 아이디입니다. ");
+            throw new UserIdDuplicationException(request.getUserId());
         }
         if(userRepository.findByPhoneNumber(request.getPhoneNumber()).isPresent()){
-            throw new IllegalStateException("이미 가입된 전화번호입니다. ");
+            throw new PhoneNumberDuplicationException(request.getPhoneNumber());
         }
+        request.setPassword(passwordEncoder.encode(request.getPassword()));
+        return userRepository.save(request.toEntity());
+
     }
 }

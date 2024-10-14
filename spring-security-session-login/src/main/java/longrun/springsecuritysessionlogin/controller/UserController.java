@@ -2,21 +2,18 @@ package longrun.springsecuritysessionlogin.controller;
 
 
 import jakarta.validation.Valid;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import longrun.springsecuritysessionlogin.dto.request.SignupRequest;
+import longrun.springsecuritysessionlogin.domain.User;
+import longrun.springsecuritysessionlogin.dto.request.SignUpRequest;
 import longrun.springsecuritysessionlogin.dto.request.ForgotIdRequest;
-import longrun.springsecuritysessionlogin.dto.response.ForgotIdResponse;
+import longrun.springsecuritysessionlogin.dto.response.SignUpResponse;
 import longrun.springsecuritysessionlogin.service.RecoveryService;
 import longrun.springsecuritysessionlogin.service.UserService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/member")
@@ -31,9 +28,10 @@ public class UserController {
     }
 
     @PostMapping("/sign-up")
-    public ResponseEntity<String> signup(@Valid @RequestBody SignupRequest request) {
-        userService.signUp(request);
-        return ResponseEntity.ok("signup success");
+    public ResponseEntity<SignUpResponse> signUp(@Valid @RequestBody SignUpRequest request) {
+        User user =userService.signUp(request);
+        SignUpResponse response = new SignUpResponse(HttpStatus.OK.value(),"SignUp success", user.getUserId());
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/forgot-id")
@@ -44,9 +42,9 @@ public class UserController {
     }
 
     @GetMapping("/find-id-verify")
-    public ResponseEntity<String> sendRecoveryCode(@RequestParam String email){
+    public ResponseEntity<String> sendRecoveryCode(@RequestParam("email") String email, @RequestParam("verificationCode") String verificationCode){
 
-        return ResponseEntity.ok(recoveryService.validateVerificationCode(email).getId());
+        return ResponseEntity.ok(recoveryService.validateVerificationCode(email,verificationCode));
 
     }
 }
