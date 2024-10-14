@@ -9,6 +9,7 @@ import longrun.springsecuritysessionlogin.repository.RecoveryRepository;
 import longrun.springsecuritysessionlogin.repository.UserRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -52,97 +53,98 @@ class RecoveryServiceTest {
         verify(recoveryRepository).save(any(IdRecovery.class));
     }
 
-    @Test
-    @DisplayName("인증코드 검증 - 성공")
-    @Transactional(readOnly = true)
-    void validateVerificationCode_Success() {
-        //Given
-        String email = "test1111@gmail.com";
-        IdRecovery idRecovery = IdRecovery.builder()
-                .email(email)
-                .verificationCode("1111")
-                .createdAt((LocalDateTime.now().minusMinutes(10)))//남은시간 10분
-                .build();
-        User user = User.builder()
-                .userId("test1111")
-                .email(email)
-                .name("test")
-                .password("encode@@wefewfa234254")
-                .phoneNumber("1111")
-                .role(Role.USER)
-                .build();
-        when(recoveryRepository.findByEmail(email)).thenReturn(Optional.of(idRecovery));
-        when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+    @Nested
+    @DisplayName("인증코드 검증")
+    class verficationCode {
 
-        //When
-        String maskUserId = recoveryService.validateVerificationCode(email,"1111");
+        @Test
+        @DisplayName("인증코드 검증 - 성공")
+        @Transactional(readOnly = true)
+        void validateVerificationCode_Success() {
+            //Given
+            String email = "test1111@gmail.com";
+            IdRecovery idRecovery = IdRecovery.builder()
+                    .email(email)
+                    .verificationCode("1111")
+                    .createdAt((LocalDateTime.now().minusMinutes(10)))//남은시간 10분
+                    .build();
+            User user = User.builder()
+                    .userId("test1111")
+                    .email(email)
+                    .name("test")
+                    .password("encode@@wefewfa234254")
+                    .phoneNumber("1111")
+                    .role(Role.USER)
+                    .build();
+            when(recoveryRepository.findByEmail(email)).thenReturn(Optional.of(idRecovery));
+            when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
 
-        //Then
-        Assertions.assertThat("test*1**").isEqualTo(maskUserId);
-    }
+            //When
+            String maskUserId = recoveryService.validateVerificationCode(email, "1111");
 
-    @Test
-    @DisplayName("인증코드 검증 - 실패(인증코드 존재 x)")
-    @Transactional(readOnly = true)
-    void validateVerificationCode_VerificationCodeNotFoundFailure() {
-        //Given
-        String email = "test1111@gmail.com";
-        when(recoveryRepository.findByEmail(email)).thenReturn(Optional.empty());
+            //Then
+            Assertions.assertThat("test*1**").isEqualTo(maskUserId);
+        }
 
-        //When
-        Throwable throwable = catchThrowable(() -> recoveryService.validateVerificationCode(email,"1111"));
+        @Test
+        @DisplayName("인증코드 검증 - 실패(인증코드 존재 x)")
+        @Transactional(readOnly = true)
+        void validateVerificationCode_VerificationCodeNotFoundFailure() {
+            //Given
+            String email = "test1111@gmail.com";
+            when(recoveryRepository.findByEmail(email)).thenReturn(Optional.empty());
 
-        //Then
-        assertThat(throwable)
-                .isInstanceOf(VerificationNotFoundException.class)
-                .hasMessageContaining(email);
-    }
+            //When
+            Throwable throwable = catchThrowable(() -> recoveryService.validateVerificationCode(email, "1111"));
 
-    @Test
-    @DisplayName("인증코드 검증 - 실패(인증코드 불일치)")
-    @Transactional(readOnly = true)
-    void validateVerificationCode_VerificationCodeNotSameFailure() {
-        //Given
-        String email = "test1111@gmail.com";
-        IdRecovery idRecovery = IdRecovery.builder()
-                .email(email)
-                .verificationCode("1111")
-                .createdAt((LocalDateTime.now().minusMinutes(10)))//남은시간 10분
-                .build();
-        when(recoveryRepository.findByEmail(email)).thenReturn(Optional.of(idRecovery));
+            //Then
+            assertThat(throwable)
+                    .isInstanceOf(VerificationNotFoundException.class)
+                    .hasMessageContaining(email);
+        }
 
-        //When
-        Throwable throwable = catchThrowable(() ->recoveryService.validateVerificationCode(email,"xxxx"));
+        @Test
+        @DisplayName("인증코드 검증 - 실패(인증코드 불일치)")
+        @Transactional(readOnly = true)
+        void validateVerificationCode_VerificationCodeNotSameFailure() {
+            //Given
+            String email = "test1111@gmail.com";
+            IdRecovery idRecovery = IdRecovery.builder()
+                    .email(email)
+                    .verificationCode("1111")
+                    .createdAt((LocalDateTime.now().minusMinutes(10)))//남은시간 10분
+                    .build();
+            when(recoveryRepository.findByEmail(email)).thenReturn(Optional.of(idRecovery));
 
-        //Then
-        assertThat(throwable)
-                .isInstanceOf(InvalidVerificationCodeException.class)
-                .hasMessageContaining(email);
-    }
+            //When
+            Throwable throwable = catchThrowable(() -> recoveryService.validateVerificationCode(email, "xxxx"));
 
-    @Test
-    @DisplayName("인증코드 검증 - 실패(시간 초과)")
-    @Transactional(readOnly = true)
-    void validateVerificationCode_TimeOutFailure() {
-        //Given
-        String email = "test1111@gmail.com";
-        IdRecovery idRecovery = IdRecovery.builder()
-                .email(email)
-                .verificationCode("1111")
-                .createdAt((LocalDateTime.now().minusMinutes(30)))//20분 초과
-                .build();
-        when(recoveryRepository.findByEmail(email)).thenReturn(Optional.of(idRecovery));
+            //Then
+            assertThat(throwable)
+                    .isInstanceOf(InvalidVerificationCodeException.class)
+                    .hasMessageContaining(email);
+        }
 
-        //When
-        Throwable throwable = catchThrowable(() ->recoveryService.validateVerificationCode(email,"1111"));
+        @Test
+        @DisplayName("인증코드 검증 - 실패(시간 초과)")
+        @Transactional(readOnly = true)
+        void validateVerificationCode_TimeOutFailure() {
+            //Given
+            String email = "test1111@gmail.com";
+            IdRecovery idRecovery = IdRecovery.builder()
+                    .email(email)
+                    .verificationCode("1111")
+                    .createdAt((LocalDateTime.now().minusMinutes(30)))//20분 초과
+                    .build();
+            when(recoveryRepository.findByEmail(email)).thenReturn(Optional.of(idRecovery));
 
-        //Then
-        assertThat(throwable)
-                .isInstanceOf(ExpiredVerificationCodeException.class)
-                .hasMessageContaining(email);
-    }
+            //When
+            Throwable throwable = catchThrowable(() -> recoveryService.validateVerificationCode(email, "1111"));
 
-    @Test
-    void maskUserId() {
+            //Then
+            assertThat(throwable)
+                    .isInstanceOf(ExpiredVerificationCodeException.class)
+                    .hasMessageContaining(email);
+        }
     }
 }

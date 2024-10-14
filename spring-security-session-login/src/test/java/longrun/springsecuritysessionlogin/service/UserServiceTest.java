@@ -14,6 +14,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -52,6 +53,7 @@ class UserServiceTest {
     @DisplayName("이메일 찾기")
     class findByEmail_Test {
         @Test
+        @Transactional(readOnly = true)
         @DisplayName("해당 이메일이 존재할 때")
         void findByEmail_UserFound() {
             //Given
@@ -66,6 +68,7 @@ class UserServiceTest {
         }
 
         @Test
+        @Transactional(readOnly = true)
         @DisplayName("해당 이메일이 존재하지 않을 떄")
         void findByEmail_UserNotFound() {
             //Given
@@ -86,6 +89,7 @@ class UserServiceTest {
     @DisplayName("회원가입")
     class signUp_Test {
         @Test
+        @Transactional
         @DisplayName("회원가입 성공")
         void signUp_Success() {
             // Given
@@ -103,6 +107,7 @@ class UserServiceTest {
         }
 
         @Test
+        @Transactional(readOnly = true)
         @DisplayName("회원가입 실패 - 중복이메일")
         void signUp_DuplicateEmail() {
             // Given
@@ -119,6 +124,7 @@ class UserServiceTest {
         }
 
         @Test
+        @Transactional(readOnly = true)
         @DisplayName("회원가입 실패 - 중복아이디")
         void signUp_DuplicateUserId() {
             // Given
@@ -136,6 +142,7 @@ class UserServiceTest {
         }
 
         @Test
+        @Transactional(readOnly = true)
         @DisplayName("회원가입 실패 - 중복전화번호")
         void signUp_DuplicatePhoneNumber() {
             // Given

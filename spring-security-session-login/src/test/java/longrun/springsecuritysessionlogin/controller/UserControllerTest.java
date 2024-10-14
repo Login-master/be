@@ -6,11 +6,13 @@ import longrun.springsecuritysessionlogin.config.CorsConfig;
 import longrun.springsecuritysessionlogin.config.SecurityConfig;
 import longrun.springsecuritysessionlogin.domain.Role;
 import longrun.springsecuritysessionlogin.domain.User;
+import longrun.springsecuritysessionlogin.dto.request.ForgotIdRequest;
 import longrun.springsecuritysessionlogin.dto.request.SignUpRequest;
 import longrun.springsecuritysessionlogin.dto.response.SignUpResponse;
 import longrun.springsecuritysessionlogin.exception.DuplicationException;
 import longrun.springsecuritysessionlogin.exception.EmailDuplicationException;
 import longrun.springsecuritysessionlogin.exception.ErrorCode;
+import longrun.springsecuritysessionlogin.exception.ExpiredVerificationCodeException;
 import longrun.springsecuritysessionlogin.service.RecoveryService;
 import longrun.springsecuritysessionlogin.service.UserService;
 import org.junit.jupiter.api.DisplayName;
@@ -35,12 +37,13 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.verify;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(UserController.class)
 //@AutoConfigureMockMvc(addFilters = false) //Filter 등록 x(인증 안함)
@@ -116,10 +119,74 @@ class UserControllerTest {
     }
 
     @Test
-    void createIdRecoveryCode() {
+    @WithMockUser
+    @DisplayName("인증코드 생성 - 성공")
+    void createIdRecoveryCode_Success() throws Exception{
+        //Given
+        ForgotIdRequest request = new ForgotIdRequest("test1111@gmail.com");
+        given(userService.findByEmail(request.getEmail())).willReturn(User.builder()
+                .userId("test1111")
+                .email("test1111@gmail.com")
+                .name("test")
+                .password("encode@@Test11111") //암호화 되었다고 가정
+                .phoneNumber("01011111111")
+                .role(Role.USER)
+                .build());
+        doNothing().when(recoveryService).saveVerificationCode(request);
+        // When
+        ResultActions actions = mockMvc.perform(post("/member/forgot-id")
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .content("{\"email\": \"test1111@gmail.com\"}")
+                                        .with(csrf()));
+
+        //Then
+        actions
+                .andExpect(status().isOk())
+                .andExpect(content().string("create recoveryCode"))
+                .andDo(print());
     }
 
+
     @Test
-    void sendRecoveryCode() {
+    @WithMockUser
+    @DisplayName("아이디 찾기 인증 성공")
+    void sendRecoveryCode_Success() throws Exception {
+        //Given
+        String email = "test1111@gmail.com";
+        String verificationCode = "1111";
+        given(recoveryService.validateVerificationCode(email,verificationCode)).willReturn("test*1**");
+
+        //When
+        ResultActions actions = mockMvc.perform(get("/member/find-id-verify")
+                                            .param("email", email)
+                                            .param("verificationCode", verificationCode)
+                                            .with(csrf()));
+
+        //then
+        actions
+                .andExpect(status().isOk())
+                .andExpect(content().string("test*1**"))
+                .andDo(print());
+    }
+    @Test
+    @WithMockUser
+    @DisplayName("아이디 찾기 인증 실패 - 인증시간경과")
+    void sendRecoveryCode_Failure() throws Exception {
+        //Given
+        String email = "test1111@gmail.com";
+        String verificationCode = "1111";
+        given(recoveryService.validateVerificationCode(email,verificationCode)).willThrow(new ExpiredVerificationCodeException(email));
+
+        //When
+        ResultActions actions = mockMvc.perform(get("/member/find-id-verify")
+                .param("email", email)
+                .param("verificationCode", verificationCode)
+                .with(csrf()));
+
+        //then
+        actions
+                .andExpect(status().is(ErrorCode.EXPIRED_VERIFICATION_CODE.getStatus()))
+                .andExpect(jsonPath("$.message").value(ErrorCode.EXPIRED_VERIFICATION_CODE.getMessage()))
+                .andDo(print());
     }
 }
