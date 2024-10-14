@@ -6,16 +6,14 @@ import longrun.springsecuritysessionlogin.domain.IdRecovery;
 import longrun.springsecuritysessionlogin.domain.User;
 import longrun.springsecuritysessionlogin.dto.request.ForgotIdRequest;
 import longrun.springsecuritysessionlogin.dto.response.ForgotIdResponse;
-import longrun.springsecuritysessionlogin.exception.BusinessException;
-import longrun.springsecuritysessionlogin.exception.ErrorCode;
-import longrun.springsecuritysessionlogin.exception.UserNotFoundException;
-import longrun.springsecuritysessionlogin.exception.VerificationNotFoundException;
+import longrun.springsecuritysessionlogin.exception.*;
 import longrun.springsecuritysessionlogin.repository.RecoveryRepository;
 import longrun.springsecuritysessionlogin.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -37,11 +35,11 @@ public class RecoveryService {
 
         recoveryRepository.save(idRecovery);
     }
-    public String validateVerificationCode(String email){
+    public String validateVerificationCode(String email,String verificationCode){
         IdRecovery idRecovery = recoveryRepository.findByEmail(email)
                 .orElseThrow(()->new VerificationNotFoundException(email));
-        if(idRecovery.getVerificationCode() == "1111"){
-            throw new BusinessException(ErrorCode.INVALID_VERIFICATION_CODE,email);
+        if(!Objects.equals(idRecovery.getVerificationCode(), verificationCode)){
+            throw new InvalidVerificationCodeException(email);
         }
         // 인증시간 초과했나 비교 (제한 20분)
         Duration diff = Duration.between(idRecovery.getCreatedAt(), LocalDateTime.now());
@@ -51,7 +49,7 @@ public class RecoveryService {
                     .orElseThrow(()->new UserNotFoundException(email));
             return new ForgotIdResponse(maskUserId(user.getUserId())).getId();
         }
-        throw new BusinessException(ErrorCode.EXPIRED_VERIFICATION_CODE,email);// 시간초과 오류
+        throw new ExpiredVerificationCodeException(email);// 시간초과 오류
     }
 
     public static String maskUserId(String userId){
