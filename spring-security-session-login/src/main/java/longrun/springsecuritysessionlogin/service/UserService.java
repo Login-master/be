@@ -21,7 +21,7 @@ public class UserService {
                 .orElseThrow(() -> new UserNotFoundException(email));
     }
 
-    public void signUp(SignUpRequest request){
+    public User signUp(SignUpRequest request){
         if(userRepository.findByEmail(request.getEmail()).isPresent()){
             throw new EmailDuplicationException(request.getEmail());
         }
@@ -32,6 +32,7 @@ public class UserService {
             throw new PhoneNumberDuplicationException(request.getPhoneNumber());
         }
         request.setPassword(passwordEncoder.encode(request.getPassword()));
-        userRepository.save(request.toEntity());
+        return userRepository.save(request.toEntity());
+
     }
 }

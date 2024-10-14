@@ -3,6 +3,7 @@ package longrun.springsecuritysessionlogin.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import longrun.springsecuritysessionlogin.domain.User;
 import longrun.springsecuritysessionlogin.dto.request.SignUpRequest;
 import longrun.springsecuritysessionlogin.dto.request.ForgotIdRequest;
 import longrun.springsecuritysessionlogin.dto.response.SignUpResponse;
@@ -27,9 +28,9 @@ public class UserController {
     }
 
     @PostMapping("/sign-up")
-    public ResponseEntity<SignUpResponse> signup(@Valid @RequestBody SignUpRequest request) {
-        userService.signUp(request);
-        SignUpResponse response = new SignUpResponse(HttpStatus.OK.value(),"Signup success", null);
+    public ResponseEntity<SignUpResponse> signUp(@Valid @RequestBody SignUpRequest request) {
+        User user =userService.signUp(request);
+        SignUpResponse response = new SignUpResponse(HttpStatus.OK.value(),"SignUp success", user.getUserId());
         return ResponseEntity.ok(response);
     }
 

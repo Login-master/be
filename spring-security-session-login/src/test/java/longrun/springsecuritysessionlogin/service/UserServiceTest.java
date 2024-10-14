@@ -42,7 +42,7 @@ class UserServiceTest {
                 .userId("test1111")
                 .email("test1111@gmail.com")
                 .name("test")
-                .password("@@wefewfa234254")
+                .password(passwordEncoder.encode("@@wefewfa234254"))
                 .phoneNumber("1111")
                 .role(Role.USER)
                 .build();
