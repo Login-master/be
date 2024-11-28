@@ -22,11 +22,11 @@ public class RecoveryService {
     private final RecoveryRepository recoveryRepository;
     private final UserRepository userRepository;
 
-    private String createVerificationCode(){
+    private String createVerificationCode() {
         return "1111";
     }
 
-    public void saveVerificationCode(ForgotIdRequest request){
+    public void saveVerificationCode(ForgotIdRequest request) {
         IdRecovery idRecovery = IdRecovery.builder()
                 .email(request.getEmail())
                 .verificationCode(createVerificationCode())
@@ -35,30 +35,36 @@ public class RecoveryService {
 
         recoveryRepository.save(idRecovery);
     }
-    public String validateVerificationCode(String email,String verificationCode){
+
+    public void deleteVerificationCode(IdRecovery idRecovery) {
+        recoveryRepository.delete(idRecovery);
+    }
+
+    public String validateVerificationCode(String email, String verificationCode) {
         IdRecovery idRecovery = recoveryRepository.findByEmail(email)
-                .orElseThrow(()->new VerificationNotFoundException(email));
-        if(!Objects.equals(idRecovery.getVerificationCode(), verificationCode)){
+                .orElseThrow(() -> new VerificationNotFoundException(email));
+        if (!Objects.equals(idRecovery.getVerificationCode(), verificationCode)) {
             throw new InvalidVerificationCodeException(email);
         }
+        deleteVerificationCode(idRecovery);
         // 인증시간 초과했나 비교 (제한 20분)
         Duration diff = Duration.between(idRecovery.getCreatedAt(), LocalDateTime.now());
         long diffMin = diff.toMinutes();
-        if(diffMin < 20){
+        if (diffMin < 20) {
             User user = userRepository.findByEmail(email)
-                    .orElseThrow(()->new UserNotFoundException(email));
-            return new ForgotIdResponse(maskUserId(user.getUserId())).getId();
+                    .orElseThrow(() -> new UserNotFoundException(email));
+            return maskUserId(user.getUserId());
         }
         throw new ExpiredVerificationCodeException(email);// 시간초과 오류
     }
 
-    public static String maskUserId(String userId){
+    public static String maskUserId(String userId) {
         int length = userId.length();
 
         StringBuilder maskedId = new StringBuilder(userId);
-        maskedId.setCharAt(length/2, '*');
-        maskedId.setCharAt(length-1, '*');
-        maskedId.setCharAt(length-2, '*');
+        maskedId.setCharAt(length / 2, '*');
+        maskedId.setCharAt(length - 1, '*');
+        maskedId.setCharAt(length - 2, '*');
 
         return maskedId.toString();
     }

@@ -1,8 +1,6 @@
 package longrun.springsecuritysessionlogin.dto.response;
 
-import jakarta.validation.constraints.NotBlank;
 import lombok.*;
-import longrun.springsecuritysessionlogin.exception.ErrorCode;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -15,8 +13,8 @@ public class ErrorResponse {
     @Builder
     private ErrorResponse(final int status, final String code, final String message, final String value) {
         this.status = status;
-        this.message = message;
         this.code = code;
+        this.message = message;
         this.value = value;
     }
 }

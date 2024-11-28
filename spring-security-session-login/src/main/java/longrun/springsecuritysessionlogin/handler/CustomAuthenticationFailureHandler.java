@@ -4,9 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import longrun.springsecuritysessionlogin.exception.ErrorCode;
+import longrun.springsecuritysessionlogin.dto.response.ErrorCode;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 
@@ -22,6 +21,6 @@ public class CustomAuthenticationFailureHandler extends SimpleUrlAuthenticationF
         response.setStatus(errorCode.getStatus());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("UTF-8");
-        objectMapper.writeValue(response.getWriter(), errorCode );
+        objectMapper.writeValue(response.getWriter(), errorCode);
     }
 }

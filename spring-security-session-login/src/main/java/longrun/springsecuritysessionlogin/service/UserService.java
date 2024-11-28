@@ -21,14 +21,14 @@ public class UserService {
                 .orElseThrow(() -> new UserNotFoundException(email));
     }
 
-    public User signUp(SignUpRequest request){
-        if(userRepository.findByEmail(request.getEmail()).isPresent()){
+    public User signUp(SignUpRequest request) {
+        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
             throw new EmailDuplicationException(request.getEmail());
         }
-        if(userRepository.findByUserId(request.getUserId()).isPresent()){
+        if (userRepository.findByUserId(request.getUserId()).isPresent()) {
             throw new UserIdDuplicationException(request.getUserId());
         }
-        if(userRepository.findByPhoneNumber(request.getPhoneNumber()).isPresent()){
+        if (userRepository.findByPhoneNumber(request.getPhoneNumber()).isPresent()) {
             throw new PhoneNumberDuplicationException(request.getPhoneNumber());
         }
         request.setPassword(passwordEncoder.encode(request.getPassword()));

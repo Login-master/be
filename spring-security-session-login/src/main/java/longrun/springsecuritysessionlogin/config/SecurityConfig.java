@@ -32,17 +32,16 @@ public class SecurityConfig {
     private final CustomUserDetailsService customUserDetailsService;
 
 
-
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         AuthenticationManager authenticationManager = authenticationManager(http.getSharedObject(AuthenticationConfiguration.class));
         CustomAuthenticationFilter authenticationFilter = customAuthenticationFilter(authenticationManager);
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors
                         .configurationSource(CorsConfig.corsConfigurationSource()))
-                .authorizeHttpRequests((authorize)-> authorize
-                        .requestMatchers("/member/login","/member/sign-up","/member/forgot-id","/member/find-id-verify").permitAll()
+                .authorizeHttpRequests((authorize) -> authorize
+                        .requestMatchers("/member/login", "/member/sign-up", "/member/forgot-id", "/member/find-id-verify").permitAll()
                         .anyRequest().authenticated())
 //                .formLogin(form -> form
 //                        .loginPage("/login")
@@ -54,7 +53,7 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
                         .maximumSessions(1) //최대 동시 접속 세션 1개
                         .maxSessionsPreventsLogin(true)) //동시 로그인 차단
-                .logout(logout->logout
+                .logout(logout -> logout
                         .logoutUrl("/member/logout")
                         .logoutSuccessHandler((request, response, authentication) -> {
                             response.setStatus(HttpServletResponse.SC_OK); // 상태 코드 200
@@ -77,21 +76,24 @@ public class SecurityConfig {
 
         return daoAuthenticationProvider;
     }
+
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
+
     @Bean
-    public CustomAuthenticationSuccessHandler authenticationSuccessHandler(){
+    public CustomAuthenticationSuccessHandler authenticationSuccessHandler() {
         return new CustomAuthenticationSuccessHandler();
     }
 
     @Bean
-    public CustomAuthenticationFailureHandler authenticationFailureHandler(){
+    public CustomAuthenticationFailureHandler authenticationFailureHandler() {
         return new CustomAuthenticationFailureHandler();
     }
+
     @Bean
-    public CustomAuthenticationFilter customAuthenticationFilter(AuthenticationManager authenticationManager) throws Exception{
+    public CustomAuthenticationFilter customAuthenticationFilter(AuthenticationManager authenticationManager) throws Exception {
         CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter();
         customAuthenticationFilter.setAuthenticationManager(authenticationManager);
         customAuthenticationFilter.setAuthenticationSuccessHandler(authenticationSuccessHandler());
@@ -103,7 +105,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public static PasswordEncoder passwordEncoder(){
+    public static PasswordEncoder passwordEncoder() {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 }
