@@ -5,11 +5,11 @@ import lombok.RequiredArgsConstructor;
 import longrun.springsecuritysessionlogin.domain.IdRecovery;
 import longrun.springsecuritysessionlogin.domain.User;
 import longrun.springsecuritysessionlogin.dto.request.ForgotIdRequest;
-import longrun.springsecuritysessionlogin.dto.response.ForgotIdResponse;
 import longrun.springsecuritysessionlogin.exception.*;
 import longrun.springsecuritysessionlogin.repository.RecoveryRepository;
 import longrun.springsecuritysessionlogin.repository.UserRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -26,7 +26,9 @@ public class RecoveryService {
         return "1111";
     }
 
+    @Transactional
     public void saveVerificationCode(ForgotIdRequest request) {
+        checkVerificationCode(request.getEmail());
         IdRecovery idRecovery = IdRecovery.builder()
                 .email(request.getEmail())
                 .verificationCode(createVerificationCode())
@@ -36,10 +38,17 @@ public class RecoveryService {
         recoveryRepository.save(idRecovery);
     }
 
+    @Transactional
+    public void checkVerificationCode(String email) {
+        recoveryRepository.findByEmail(email).ifPresent(recoveryRepository::delete);
+    }
+
+    @Transactional
     public void deleteVerificationCode(IdRecovery idRecovery) {
         recoveryRepository.delete(idRecovery);
     }
 
+    @Transactional
     public String validateVerificationCode(String email, String verificationCode) {
         IdRecovery idRecovery = recoveryRepository.findByEmail(email)
                 .orElseThrow(() -> new VerificationNotFoundException(email));
