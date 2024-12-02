@@ -1,39 +1,26 @@
 package longrun.springsecuritysessionlogin.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import longrun.springsecuritysessionlogin.config.CorsConfig;
-import longrun.springsecuritysessionlogin.config.SecurityConfig;
 import longrun.springsecuritysessionlogin.domain.Role;
 import longrun.springsecuritysessionlogin.domain.User;
 import longrun.springsecuritysessionlogin.dto.request.ForgotIdRequest;
 import longrun.springsecuritysessionlogin.dto.request.SignUpRequest;
-import longrun.springsecuritysessionlogin.dto.response.SignUpResponse;
-import longrun.springsecuritysessionlogin.exception.DuplicationException;
 import longrun.springsecuritysessionlogin.exception.EmailDuplicationException;
-import longrun.springsecuritysessionlogin.exception.ErrorCode;
+import longrun.springsecuritysessionlogin.dto.response.ErrorCode;
 import longrun.springsecuritysessionlogin.exception.ExpiredVerificationCodeException;
 import longrun.springsecuritysessionlogin.service.RecoveryService;
 import longrun.springsecuritysessionlogin.service.UserService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;

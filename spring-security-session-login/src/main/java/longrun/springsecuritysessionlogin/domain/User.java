@@ -3,8 +3,9 @@ package longrun.springsecuritysessionlogin.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+
 @Entity
-@Table(name="users")
+@Table(name = "users")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User {
@@ -32,7 +33,7 @@ public class User {
     private Role role;
 
     @Builder
-    public User(String userId, String email, String password,String name, String phoneNumber ,Role role){
+    public User(String userId, String email, String password, String name, String phoneNumber, Role role) {
         this.userId = userId;
         this.email = email;
         this.password = password;

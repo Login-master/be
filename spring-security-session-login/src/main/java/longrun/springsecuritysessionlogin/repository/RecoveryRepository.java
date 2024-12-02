@@ -8,6 +8,6 @@ import java.util.Optional;
 
 
 @Repository
-public interface RecoveryRepository extends JpaRepository<IdRecovery,Long> {
+public interface RecoveryRepository extends JpaRepository<IdRecovery, Long> {
     Optional<IdRecovery> findByEmail(String email);
 }

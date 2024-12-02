@@ -1,6 +1,7 @@
 package longrun.springsecuritysessionlogin.exception;
 
 import lombok.Getter;
+import longrun.springsecuritysessionlogin.dto.response.ErrorCode;
 
 @Getter
 public class BusinessException extends RuntimeException{

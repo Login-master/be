@@ -8,6 +8,7 @@ import longrun.springsecuritysessionlogin.exception.*;
 import longrun.springsecuritysessionlogin.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -21,18 +22,18 @@ public class UserService {
                 .orElseThrow(() -> new UserNotFoundException(email));
     }
 
-    public User signUp(SignUpRequest request){
-        if(userRepository.findByEmail(request.getEmail()).isPresent()){
+    @Transactional
+    public User signUp(SignUpRequest request) {
+        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
             throw new EmailDuplicationException(request.getEmail());
         }
-        if(userRepository.findByUserId(request.getUserId()).isPresent()){
+        if (userRepository.findByUserId(request.getUserId()).isPresent()) {
             throw new UserIdDuplicationException(request.getUserId());
         }
-        if(userRepository.findByPhoneNumber(request.getPhoneNumber()).isPresent()){
+        if (userRepository.findByPhoneNumber(request.getPhoneNumber()).isPresent()) {
             throw new PhoneNumberDuplicationException(request.getPhoneNumber());
         }
         request.setPassword(passwordEncoder.encode(request.getPassword()));
         return userRepository.save(request.toEntity());
-
     }
 }
